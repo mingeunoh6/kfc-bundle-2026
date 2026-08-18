@@ -25,10 +25,11 @@
 	import { KfcEffect } from '$lib/kfc/KfcEffect'
 	import { EFFECT_SCALE } from '$lib/kfc/kfc-config'
 	import {
-		BURST_FLOOR_Y_LOCAL,
+		KEY_LIGHT,
 		WALL_ANCHOR_HEIGHT,
 		WALL_DISTANCE,
 		WALL_HEIGHT,
+		WALL_SHADOW_OPACITY,
 		WALL_THICKNESS,
 		WALL_WIDTH
 	} from '$lib/kfc/wall-layout'
@@ -55,30 +56,29 @@
 		const previousEnvironment = scene.environment
 		const previousEnvironmentIntensity = scene.environmentIntensity
 		scene.environment = envTexture
-		scene.environmentIntensity = 0.9
+		scene.environmentIntensity = 1
 
-		// ── Lights. Warm key light from above/front (colour from the original scene),
-		//    casting shadows onto the virtual wall and the floor.
-		const hemi = new THREE.HemisphereLight(0xffffff, 0x555555, 0.35)
-		group.add(hemi)
-
-		const key = new THREE.DirectionalLight(new THREE.Color(0.896, 0.708, 0.451), 1.4)
-		key.position.set(1.5, 4.5, -WALL_DISTANCE + 3)
+		// ── Key light: the Scene.zcomp DirectionalLight (warm, intensity 0.1,
+		//    shadow camera ±10), placed relative to the wall anchor.
+		const [kx, ky, kz] = KEY_LIGHT.offset
+		const key = new THREE.DirectionalLight(new THREE.Color(...KEY_LIGHT.color), KEY_LIGHT.intensity)
+		key.position.set(kx, WALL_ANCHOR_HEIGHT + ky, -WALL_DISTANCE + kz)
 		key.target.position.set(0, WALL_ANCHOR_HEIGHT, -WALL_DISTANCE)
 		key.castShadow = true
 		key.shadow.mapSize.set(1024, 1024)
 		key.shadow.camera.near = 0.1
-		key.shadow.camera.far = 20
-		key.shadow.camera.left = -5
-		key.shadow.camera.right = 5
-		key.shadow.camera.top = 5
-		key.shadow.camera.bottom = -5
+		key.shadow.camera.far = 30
+		key.shadow.camera.left = -KEY_LIGHT.shadowExtent
+		key.shadow.camera.right = KEY_LIGHT.shadowExtent
+		key.shadow.camera.top = KEY_LIGHT.shadowExtent
+		key.shadow.camera.bottom = -KEY_LIGHT.shadowExtent
 		key.shadow.bias = -0.0005
 		group.add(key, key.target)
 
 		// ── Virtual wall: a box standing on the floor, front face at z = -WALL_DISTANCE.
 		//    Not rendered as a surface — only the shadows cast onto it show
-		//    (ShadowMaterial). `?debug` in the URL tints it so it can be checked.
+		//    (ShadowMaterial, opacity of the original ShadowPlane). `?debug` in the
+		//    URL tints it so it can be checked.
 		const wallGroup = new THREE.Group()
 		wallGroup.name = 'VirtualWallAnchor'
 		wallGroup.position.set(0, 0, -WALL_DISTANCE)
@@ -86,25 +86,18 @@
 		const wallGeometry = new THREE.BoxGeometry(WALL_WIDTH, WALL_HEIGHT, WALL_THICKNESS)
 		const wallMaterial = debug
 			? new THREE.MeshBasicMaterial({ color: 0x00aaff, transparent: true, opacity: 0.18 })
-			: new THREE.ShadowMaterial({ opacity: 0.22, transparent: true })
+			: new THREE.ShadowMaterial({ opacity: WALL_SHADOW_OPACITY, transparent: true })
 		const wall = new THREE.Mesh(wallGeometry, wallMaterial)
 		wall.name = 'VirtualWall'
 		wall.position.set(0, WALL_HEIGHT / 2, -WALL_THICKNESS / 2)
 		wall.receiveShadow = true
 		wallGroup.add(wall)
 
-		// ── Floor shadow catcher (the real floor at y = 0).
-		const floorGeometry = new THREE.PlaneGeometry(30, 30)
-		floorGeometry.rotateX(-Math.PI / 2)
-		const floorMaterial = new THREE.ShadowMaterial({ opacity: 0.35, transparent: true })
-		const floor = new THREE.Mesh(floorGeometry, floorMaterial)
-		floor.name = 'FloorShadowCatcher'
-		floor.receiveShadow = true
-		group.add(floor)
-
-		// ── The KFC effect, hanging on the wall's front face.
+		// ── The KFC effect, hanging on the wall's front face. All physics/layout
+		//    values are the Scene.zcomp ones (kfc-config.ts); its own shadow floor
+		//    at burstFloorY doubles as the floor shadow catcher.
 		fx = new KfcEffect(
-			{ burstFloorY: BURST_FLOOR_Y_LOCAL, showBurstFloorDebug: debug },
+			{ showBurstFloorDebug: debug },
 			{
 				onPhase: (phase) => (kfc.phase = phase),
 				onProgress: (ratio) => (kfc.loadProgress = ratio),
@@ -180,10 +173,7 @@
 			scene.remove(activeGroup)
 			wallGeometry.dispose()
 			wallMaterial.dispose()
-			floorGeometry.dispose()
-			floorMaterial.dispose()
 			key.dispose()
-			hemi.dispose()
 
 			if (scene.environment === envTexture) {
 				scene.environment = previousEnvironment

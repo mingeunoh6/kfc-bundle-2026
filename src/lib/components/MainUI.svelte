@@ -12,6 +12,7 @@
 	import { xr } from '$lib/xr/xr-state.svelte'
 	import { kfc } from '$lib/kfc/kfc-state.svelte'
 	import touchGuideUrl from '$lib/assets/touch_guide.png'
+	import Lottie from './Lottie.svelte'
 
 	const KFC_APP_URL =
 		'https://kfckr.airbridge.io/braze/signup?airbridge_referrer=airbridge%3Dtrue%26client_id%3D7eecfe93-e4fa-42eb-82f9-2d4b1dfd4bea%26event_uuid%3Df0efc2e1-9354-4dfe-86e3-5c142aa0324f%26referrer_timestamp%3D1778780090852%26short_id%3Dvseii9%26channel%3Dhomepage_web%26campaign%3Dapp_download_QR%26tracking_template_id%3Dedc49716cb675d79bc707cae26a20aa9&https_deeplink=true&short_id=vseii9'
@@ -42,11 +43,10 @@
 	{/if}
 
 	{#if showCta}
-		<div class="cta">
-			<a href={KFC_APP_URL} target="_blank" rel="noopener noreferrer">
-				앱으로 이동하여 다양한 혜택을 누리세요!
-			</a>
-		</div>
+		<a class="cta" href={KFC_APP_URL} target="_blank" rel="noopener noreferrer">
+			<Lottie src="/lottie/kfcclick2.json" class="click-lottie" />
+			<span class="phrase">앱으로 이동하여 다양한 혜택을 누리세요!</span>
+		</a>
 	{/if}
 </div>
 
@@ -131,6 +131,7 @@
 		}
 	}
 
+	/* Port of .SCREENUI + .click_video + .phrase from placement.css */
 	.cta {
 		position: absolute;
 		left: 0;
@@ -143,19 +144,24 @@
 		padding-bottom: env(safe-area-inset-bottom);
 		animation: slide-up 0.6s ease-out;
 		pointer-events: auto;
+		text-decoration: none;
 	}
 
-	.cta a {
+	.cta :global(.click-lottie) {
+		width: 80px;
+		aspect-ratio: 2;
+	}
+
+	.phrase {
 		display: block;
 		width: 100%;
 		box-sizing: border-box;
-		padding: 0.75rem 0.5rem;
+		padding: 0.5rem;
 		background: #e1021f;
 		color: #fff;
 		font-size: 0.85rem;
 		font-weight: 800;
 		text-align: center;
-		text-decoration: none;
 	}
 
 	@keyframes slide-up {

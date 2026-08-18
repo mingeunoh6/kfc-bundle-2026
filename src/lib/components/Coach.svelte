@@ -10,6 +10,7 @@
 	import { xr } from '$lib/xr/xr-state.svelte'
 	import { kfc } from '$lib/kfc/kfc-state.svelte'
 	import logoUrl from '$lib/assets/kfc_logo_white.png'
+	import Lottie from './Lottie.svelte'
 
 	const progressPct = $derived(Math.round(kfc.loadProgress * 100))
 
@@ -25,6 +26,7 @@
 <div class="backdrop">
 	<div class="coach" role="dialog" aria-modal="true" aria-label="AR 안내">
 		<div class="title">작품 감상 TIP!</div>
+		<Lottie src="/lottie/coach2.json" class="guide" />
 		<div class="body">
 			<p class="main">벽면을 정면으로 비추고<br />시작하기를 눌러주세요</p>
 			<p class="sub">
@@ -87,6 +89,13 @@
 		background: rgb(206 21 21);
 		font-weight: 800;
 		font-size: 0.95rem;
+	}
+
+	.coach :global(.guide) {
+		width: 100%;
+		aspect-ratio: 1;
+		max-height: 40vh;
+		opacity: 0.7;
 	}
 
 	.body {
