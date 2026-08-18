@@ -5,14 +5,17 @@
  */
 // Loads the 8th Wall open-source engine at runtime.
 //
-// The official example (threejs-world-effects-example) loads these three scripts with
+// The official example (threejs-world-effects-example) loads these scripts with
 // static <script> tags in index.html. In SvelteKit we inject them from the browser
 // instead, so the engine is only fetched on pages that actually use AR and SSR stays
 // untouched.
 //
 //   engine-binary  — the XR engine + SLAM (binary-licensed, free for commercial use)
 //   xrextras       — loading screen, full-window canvas, runtime error overlays (MIT)
-//   landing-page   — desktop landing page with QR code handoff to mobile (MIT)
+//
+// The 8th Wall landing-page module (desktop QR handoff, with a "Powered by 8th Wall"
+// footer that cannot be disabled) is intentionally NOT loaded — desktop visitors get
+// our own KFC-styled DesktopLanding.svelte instead (see +page.svelte).
 
 import { browser } from '$app/environment'
 import type { XR8Api } from './types'
@@ -22,8 +25,7 @@ const ENGINE_SCRIPTS: { src: string; attrs: Record<string, string> }[] = [
 		src: 'https://cdn.jsdelivr.net/npm/@8thwall/engine-binary@1/dist/xr.js',
 		attrs: { 'data-preload-chunks': 'slam' }
 	},
-	{ src: 'https://cdn.jsdelivr.net/npm/@8thwall/xrextras@1/dist/xrextras.js', attrs: {} },
-	{ src: 'https://cdn.jsdelivr.net/npm/@8thwall/landing-page@1/dist/landing-page.js', attrs: {} }
+	{ src: 'https://cdn.jsdelivr.net/npm/@8thwall/xrextras@1/dist/xrextras.js', attrs: {} }
 ]
 
 let loadPromise: Promise<XR8Api> | null = null

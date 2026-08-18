@@ -11,6 +11,8 @@
 	import MainUI from '$lib/components/MainUI.svelte'
 	import Splash from '$lib/components/Splash.svelte'
 	import Start from '$lib/components/Start.svelte'
+	import DesktopLanding from '$lib/components/DesktopLanding.svelte'
+	import { isDesktopVisitor } from '$lib/xr/device'
 	import { xr } from '$lib/xr/xr-state.svelte'
 	import { CREATOR, SITE, SITE_URL } from '$lib/site'
 
@@ -91,6 +93,13 @@
 	// The AR session only mounts after the user taps 시작하기 on the start screen.
 	let started = $state(false)
 
+	// Desktop browsers get the QR handoff page instead of the AR flow (decided after
+	// hydration so the prerendered HTML — Start screen + SEO copy — stays identical).
+	let desktop = $state(false)
+	$effect(() => {
+		desktop = isDesktopVisitor()
+	})
+
 	// Custom splash covers the screen from tap until the camera feed is running.
 	const showSplash = $derived(
 		started && (xr.status === 'loading' || xr.status === 'starting')
@@ -139,7 +148,9 @@
 	{@html `<script type="application/ld+json">${jsonLd}</script>`}
 </svelte:head>
 
-{#if !started}
+{#if desktop}
+	<DesktopLanding />
+{:else if !started}
 	<Start onstart={() => (started = true)} />
 {:else}
 	<ARScene />

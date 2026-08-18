@@ -40,7 +40,6 @@
 					XR8.GlTextureRenderer.pipelineModule(), // Draws the camera feed.
 					XR8.Threejs.pipelineModule(), // Creates a three.js AR scene.
 					XR8.XrController.pipelineModule(), // Enables SLAM world tracking.
-					window.LandingPage!.pipelineModule(), // Desktop landing page + QR handoff.
 					window.XRExtras!.FullWindowCanvas.pipelineModule(), // Canvas fills the window.
 					// Note: XRExtras.Loading.pipelineModule() is intentionally omitted —
 					// the default 8th Wall splash is replaced by our own Splash.svelte.
