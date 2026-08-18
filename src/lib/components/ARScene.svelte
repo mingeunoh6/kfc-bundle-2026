@@ -12,10 +12,13 @@
 	import * as THREE from 'three'
 	import { loadEngine } from '$lib/xr/engine-loader'
 	import { initScenePipelineModule } from '$lib/xr/scene-pipeline'
+	import { installPromptLocalizer } from '$lib/xr/prompt-localizer'
 	import { xr } from '$lib/xr/xr-state.svelte'
 
 	const arSession: Attachment<HTMLCanvasElement> = (canvas) => {
 		let disposed = false
+		// Localize the engine's own DOM prompts (iOS motion-sensor permission box).
+		const uninstallLocalizer = installPromptLocalizer()
 
 		const start = async () => {
 			xr.status = 'loading'
@@ -52,6 +55,7 @@
 
 		return () => {
 			disposed = true
+			uninstallLocalizer()
 			window.XR8?.stop()
 			window.XR8?.clearCameraPipelineModules()
 			xr.reset()
