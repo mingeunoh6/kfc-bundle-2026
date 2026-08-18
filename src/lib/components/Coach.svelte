@@ -1,10 +1,17 @@
 <!--
-	Coach — coach marker popup shown once the camera feed is live. It explains the
-	AR interaction, and on confirm: recenters the SLAM origin (so content appears
-	right in front of the user) and reveals the pre-compiled MainScene.
+	Coach — coach marker popup shown once the camera feed is live. Explains the
+	interaction, and on confirm: recenters the SLAM origin (so the virtual wall is
+	placed straight in front of the user) and reveals the pre-compiled MainScene.
+
+	The start button stays disabled until the KFC models have finished loading
+	(MainScene downloads them in the background while this popup is up).
 -->
 <script lang="ts">
 	import { xr } from '$lib/xr/xr-state.svelte'
+	import { kfc } from '$lib/kfc/kfc-state.svelte'
+	import logoUrl from '$lib/assets/kfc_logo_white.png'
+
+	const progressPct = $derived(Math.round(kfc.loadProgress * 100))
 
 	const begin = () => {
 		// Place the scene origin in front of where the user is pointing right now,
@@ -17,9 +24,27 @@
 
 <div class="backdrop">
 	<div class="coach" role="dialog" aria-modal="true" aria-label="AR 안내">
-		<div class="icon" aria-hidden="true">👆</div>
-		<p>화면을 탭하면 카메라가 새로 정렬됩니다.</p>
-		<button type="button" onclick={begin}>시작하기</button>
+		<div class="title">작품 감상 TIP!</div>
+		<div class="body">
+			<p class="main">벽면을 정면으로 비추고<br />시작하기를 눌러주세요</p>
+			<p class="sub">
+				2~3m 앞의 벽면에 작품이 나타납니다.<br />
+				모바일 화면을 상하좌우로 움직여 작품을 즐겨보세요.
+			</p>
+			{#if kfc.error}
+				<p class="error">모델을 불러오지 못했습니다.<br />{kfc.error}</p>
+			{/if}
+			<button type="button" onclick={begin} disabled={!kfc.loaded || !!kfc.error}>
+				{#if kfc.loaded}
+					시작하기
+				{:else}
+					불러오는 중… {progressPct}%
+				{/if}
+			</button>
+		</div>
+		<div class="logo">
+			<img src={logoUrl} alt="KFC" />
+		</div>
 	</div>
 </div>
 
@@ -37,44 +62,96 @@
 	.coach {
 		display: flex;
 		flex-direction: column;
-		align-items: center;
-		gap: 1rem;
-		width: min(100%, 20rem);
-		padding: 1.75rem 1.5rem calc(1.5rem + env(safe-area-inset-bottom) * 0.5);
-		border-radius: 1.25rem;
-		background: rgb(20 20 24 / 92%);
+		width: min(100%, 22rem);
+		border-radius: 0.6rem;
+		overflow: hidden;
+		background: rgb(0 0 0 / 55%);
 		color: #fff;
 		text-align: center;
 		backdrop-filter: blur(10px);
-		box-shadow: 0 12px 40px rgb(0 0 0 / 40%);
+		box-shadow: 0 0 12px 3px rgb(255 255 255 / 45%);
+		font-family:
+			'Pretendard Variable',
+			Pretendard,
+			-apple-system,
+			BlinkMacSystemFont,
+			system-ui,
+			'Apple SD Gothic Neo',
+			'Noto Sans KR',
+			'Malgun Gothic',
+			sans-serif;
 	}
 
-	.icon {
-		font-size: 2rem;
+	.title {
+		padding: 0.6rem 1.25rem;
+		background: rgb(206 21 21);
+		font-weight: 800;
+		font-size: 0.95rem;
+	}
+
+	.body {
+		display: flex;
+		flex-direction: column;
+		gap: 0.6rem;
+		padding: 1rem 1.25rem 1.25rem;
 	}
 
 	p {
 		margin: 0;
-		font:
-			500 1rem/1.5 system-ui,
-			sans-serif;
+	}
+
+	.main {
+		font-weight: 700;
+		font-size: 1rem;
+		line-height: 1.5;
+	}
+
+	.sub {
+		font-size: 0.8rem;
+		line-height: 1.5;
+		opacity: 0.85;
+	}
+
+	.error {
+		font-size: 0.75rem;
+		color: #ffb4b4;
 	}
 
 	button {
+		margin-top: 0.4rem;
 		width: 100%;
 		padding: 0.85rem 0;
 		border: none;
 		border-radius: 999px;
-		background: #ad50ff;
+		background: linear-gradient(94deg, #eb1c11 0%, #ed2e24 100%);
 		color: #fff;
 		font:
-			600 1.05rem/1 system-ui,
-			sans-serif;
+			800 1.05rem/1 inherit;
+		font-family: inherit;
 		cursor: pointer;
-		transition: transform 0.1s ease;
+		transition:
+			transform 0.1s ease,
+			opacity 0.2s ease;
 	}
 
-	button:active {
+	button:disabled {
+		opacity: 0.55;
+		cursor: default;
+	}
+
+	button:not(:disabled):active {
 		transform: scale(0.97);
+	}
+
+	.logo {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		background: #000;
+	}
+
+	.logo img {
+		height: 14px;
+		padding: 6px 0;
 	}
 </style>

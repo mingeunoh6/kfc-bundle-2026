@@ -6,6 +6,7 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css" />
 </svelte:head>
 
 {@render children()}

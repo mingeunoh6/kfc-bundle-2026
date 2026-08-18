@@ -21,7 +21,9 @@ export interface XrThreejsScene {
 }
 
 export interface XR8Api {
+	addCameraPipelineModule: (module: CameraPipelineModule) => void
 	addCameraPipelineModules: (modules: CameraPipelineModule[]) => void
+	removeCameraPipelineModule: (moduleOrName: CameraPipelineModule | string) => void
 	clearCameraPipelineModules: () => void
 	run: (config: { canvas: HTMLCanvasElement; allowedDevices?: unknown }) => void
 	stop: () => void

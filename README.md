@@ -1,3 +1,29 @@
+# KFC AR — 8th Wall World Tracking × SvelteKit
+
+Mattercraft + Immersal(VPS)로 제작됐던 KFC 매장 벽면 AR을 **8th Wall 월드 트래킹**으로
+마이그레이션한 프로젝트입니다. 배포: Vercel (`main` push 시 자동 배포).
+
+## 흐름
+
+1. **Start** → 카메라 권한 → **Splash**
+2. **Coach** 마커: 뒤에서 GLB 5종(castle_white / rock / kfcbox_source / kfcbox / chicken, `static/models/`)을
+   내려받고 pre-compile. 버튼은 로딩 완료 후 활성화.
+3. **시작하기** → `XR8.XrController.recenter()` → 카메라 정면 `WALL_DISTANCE`(2.5 m)에
+   보이지 않는 **가상 벽**(BoxGeometry + ShadowMaterial)을 세우고, 그 벽면 앵커(`WALL_ANCHOR_HEIGHT` 1.0 m)에
+   `KfcEffect`를 부착 → 입장 연출(캐슬이 벽에서 밀려나오고, 양옆으로 KFC 박스가 쌓임).
+4. 캐슬/박스 벽 **터치** → 박스·치킨 버스트 + 스파이스 파우더 파티클, 실제 바닥(y=0)에 물리 낙하.
+5. 첫 버스트 후 하단에 KFC 앱 CTA. 우상단 **다시 배치**로 recenter + 입장 재생.
+
+## 코드 위치
+
+- `src/lib/kfc/KfcEffect.ts` — Mattercraft `KfcEffectComponent`(kfctest.ts)의 프레임워크 무관 포팅.
+- `src/lib/kfc/kfc-config.ts` — Scene.zcomp에서 튜닝된 값이 기본값. `EFFECT_SCALE`(0.315), 모델 URL.
+- `src/lib/kfc/wall-layout.ts` — 카메라 높이 / 벽 거리·크기 / 앵커 높이 상수.
+- `src/lib/kfc/kfc-state.svelte.ts` — 로딩 진행률·phase·burstCount (rune).
+- `src/lib/components/MainScene.svelte` — 조명, 가상 벽, 이펙트 마운트, 탭 레이캐스트, per-frame update.
+- URL에 `?debug`를 붙이면 가상 벽과 burst 바닥이 반투명하게 보입니다.
+
+---
 # WebXR 8th Wall Template 2026 — SvelteKit × 8th Wall World Tracking
 
 [8th Wall 오픈소스 엔진](https://8thwall.org/)의 **World Tracking(SLAM)** 데모를

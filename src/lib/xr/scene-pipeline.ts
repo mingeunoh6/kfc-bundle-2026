@@ -2,10 +2,16 @@
 // 8th Wall example (8thwall/threejs-world-effects-example).
 //
 // It configures the three.js scene owned by XR8.Threejs.pipelineModule() — renderer,
-// initial camera pose, SLAM projection sync and tap-to-recenter. The actual scene
-// content (cube, lights, shadow plane) lives in MainScene.svelte, which mounts
-// invisibly once the camera is running and is revealed from the coach marker.
+// initial camera pose and SLAM projection sync. The actual scene content (virtual
+// wall + KFC effect, lights) lives in MainScene.svelte, which mounts invisibly once
+// the camera is running and is revealed from the coach marker.
+//
+// Note: the template's tap-anywhere-to-recenter is intentionally gone — taps are
+// raycast against the castle in MainScene to fire the burst. Recentering is
+// exposed as an explicit button in MainUI instead.
 
+import * as THREE from 'three'
+import { CAMERA_HEIGHT } from '$lib/kfc/wall-layout'
 import type { CameraPipelineModule } from './types'
 import { xr } from './xr-state.svelte'
 
@@ -22,10 +28,12 @@ export const initScenePipelineModule = (): CameraPipelineModule => ({
 		const { camera, renderer } = XR8.Threejs.xrScene()
 
 		renderer.shadowMap.enabled = true
+		renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
-		// Initial camera pose relative to the content. Must be above y = 0 so the
-		// SLAM origin starts at standing height.
-		camera.position.set(0, 2, 2)
+		// Initial camera pose: standing at the origin, CAMERA_HEIGHT above the
+		// floor (y = 0), looking down -Z. recenter() returns the camera to this
+		// pose, so the virtual wall at z = -WALL_DISTANCE is always in front.
+		camera.position.set(0, CAMERA_HEIGHT, 0)
 
 		// Prevent scroll/pinch gestures from panning the page over the canvas.
 		canvas.addEventListener('touchmove', (event) => event.preventDefault())
@@ -35,18 +43,6 @@ export const initScenePipelineModule = (): CameraPipelineModule => ({
 			origin: camera.position,
 			facing: camera.quaternion
 		})
-
-		// Recenter content in front of the user when the canvas is tapped.
-		canvas.addEventListener(
-			'touchstart',
-			(event) => {
-				if (event.touches.length === 1) {
-					XR8.XrController.recenter()
-					xr.recenterCount++
-				}
-			},
-			true
-		)
 
 		xr.status = 'running'
 	}

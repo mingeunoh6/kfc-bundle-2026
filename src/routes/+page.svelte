@@ -18,8 +18,8 @@
 </script>
 
 <svelte:head>
-	<title>8th Wall × SvelteKit — World Tracking</title>
-	<meta name="description" content="A cube augmented on the floor with 8th Wall SLAM world tracking, built with SvelteKit and Svelte 5 runes." />
+	<title>KFC AR</title>
+	<meta name="description" content="KFC 캐슬 AR — 8th Wall 월드 트래킹으로 벽면에 나타나는 KFC 성과 치킨 버스트 연출." />
 </svelte:head>
 
 {#if !started}

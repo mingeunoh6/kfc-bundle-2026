@@ -5,7 +5,7 @@
 	ARScene.svelte.
 -->
 <div class="splash">
-	<p>로딩중..</p>
+	<p>카메라를 준비하고 있어요…</p>
 </div>
 
 <style>
