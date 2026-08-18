@@ -1,20 +1,19 @@
 <!--
 	MainScene — the KFC AR content (renderless component).
 
-	Builds, under the XR8 three.js scene:
-	  • an invisible virtual wall (BoxGeometry + ShadowMaterial) standing
-	    WALL_DISTANCE m in front of the SLAM origin — the world-tracking stand-in
-	    for the Immersal-anchored real store wall of the original build;
-	  • the KfcEffect (castle entrance → box walls → tap-to-burst) attached to
-	    the wall's front face at WALL_ANCHOR_HEIGHT;
-	  • lights + a floor shadow catcher.
+	Vertical Wall AR flow (docs/VERTICAL_WALL_AR.md):
+	  stage 'wall'   — a white line on the floor follows the camera's centre ray;
+	                   tap → the line becomes the base of a virtual wall.
+	  stage 'castle' — gradient wall + red aim ring at ray ∩ wall; tap → the ring
+	                   position becomes the castle anchor.
+	  stage 'play'   — wall goes invisible (shadows only), KfcEffect is placed at
+	                   the anchor, its burst floor re-derived so bodies land on the
+	                   real floor, and the entrance plays. Taps on the castle /
+	                   box walls fire the burst.
 
 	Mounted as soon as the camera feed is running, while the coach marker is still
 	on screen: the GLBs download and the scene is pre-compiled invisibly, so that
-	revealing it (Coach → recenter → xr.contentVisible = true) is instant and the
-	entrance animation starts on a warmed-up GPU.
-
-	Taps on the castle / box walls are raycast here and fire the burst.
+	revealing it (Coach → recenter → xr.contentVisible = true) is instant.
 -->
 <script lang="ts">
 	import { untrack } from 'svelte'
@@ -23,21 +22,15 @@
 	import { xr } from '$lib/xr/xr-state.svelte'
 	import { kfc } from '$lib/kfc/kfc-state.svelte'
 	import { KfcEffect } from '$lib/kfc/KfcEffect'
+	import { WallPlacer } from '$lib/kfc/wall-placer'
 	import { EFFECT_SCALE } from '$lib/kfc/kfc-config'
-	import {
-		KEY_LIGHT,
-		WALL_ANCHOR_HEIGHT,
-		WALL_DISTANCE,
-		WALL_HEIGHT,
-		WALL_SHADOW_OPACITY,
-		WALL_THICKNESS,
-		WALL_WIDTH
-	} from '$lib/kfc/wall-layout'
+	import { KEY_LIGHT, WALL_HEIGHT, WALL_SHADOW_OPACITY, WALL_WIDTH } from '$lib/kfc/wall-layout'
 
 	const UPDATE_MODULE_NAME = 'kfc-update'
 
 	let group: THREE.Group | undefined
 	let fx: KfcEffect | undefined
+	let restart: (() => void) | undefined
 
 	// Build the content once and pre-compile it while the coach marker is up.
 	$effect(() => {
@@ -58,12 +51,18 @@
 		scene.environment = envTexture
 		scene.environmentIntensity = 1
 
+		// ── Wall placement helpers (floor line → gradient wall → aim ring).
+		const activePlacer = new WallPlacer({
+			wallWidth: WALL_WIDTH,
+			wallHeight: WALL_HEIGHT,
+			wallShadowOpacity: WALL_SHADOW_OPACITY
+		})
+		group.add(activePlacer.root)
+
 		// ── Key light: the Scene.zcomp DirectionalLight (warm, intensity 0.1,
-		//    shadow camera ±10), placed relative to the wall anchor.
-		const [kx, ky, kz] = KEY_LIGHT.offset
+		//    shadow camera ±10). Lives in the wall group and is re-aimed at the
+		//    castle anchor whenever the castle is placed.
 		const key = new THREE.DirectionalLight(new THREE.Color(...KEY_LIGHT.color), KEY_LIGHT.intensity)
-		key.position.set(kx, WALL_ANCHOR_HEIGHT + ky, -WALL_DISTANCE + kz)
-		key.target.position.set(0, WALL_ANCHOR_HEIGHT, -WALL_DISTANCE)
 		key.castShadow = true
 		key.shadow.mapSize.set(1024, 1024)
 		key.shadow.camera.near = 0.1
@@ -73,30 +72,13 @@
 		key.shadow.camera.top = KEY_LIGHT.shadowExtent
 		key.shadow.camera.bottom = -KEY_LIGHT.shadowExtent
 		key.shadow.bias = -0.0005
-		group.add(key, key.target)
+		activePlacer.wallGroup.add(key, key.target)
 
-		// ── Virtual wall: a box standing on the floor, front face at z = -WALL_DISTANCE.
-		//    Not rendered as a surface — only the shadows cast onto it show
-		//    (ShadowMaterial, opacity of the original ShadowPlane). `?debug` in the
-		//    URL tints it so it can be checked.
-		const wallGroup = new THREE.Group()
-		wallGroup.name = 'VirtualWallAnchor'
-		wallGroup.position.set(0, 0, -WALL_DISTANCE)
-
-		const wallGeometry = new THREE.BoxGeometry(WALL_WIDTH, WALL_HEIGHT, WALL_THICKNESS)
-		const wallMaterial = debug
-			? new THREE.MeshBasicMaterial({ color: 0x00aaff, transparent: true, opacity: 0.18 })
-			: new THREE.ShadowMaterial({ opacity: WALL_SHADOW_OPACITY, transparent: true })
-		const wall = new THREE.Mesh(wallGeometry, wallMaterial)
-		wall.name = 'VirtualWall'
-		wall.position.set(0, WALL_HEIGHT / 2, -WALL_THICKNESS / 2)
-		wall.receiveShadow = true
-		wallGroup.add(wall)
-
-		// ── The KFC effect, hanging on the wall's front face. All physics/layout
-		//    values are the Scene.zcomp ones (kfc-config.ts); its own shadow floor
-		//    at burstFloorY doubles as the floor shadow catcher.
-		fx = new KfcEffect(
+		// ── The KFC effect, child of the wall anchor (so it inherits the wall's
+		//    yaw). Hidden until the castle anchor is confirmed. All physics/layout
+		//    values are the Scene.zcomp ones; only burstFloorY is re-derived from
+		//    the anchor height at placement time.
+		const activeEffect = new KfcEffect(
 			{ showBurstFloorDebug: debug },
 			{
 				onPhase: (phase) => (kfc.phase = phase),
@@ -104,33 +86,57 @@
 				onBurst: () => kfc.burstCount++
 			}
 		)
-		fx.root.position.set(0, WALL_ANCHOR_HEIGHT, 0)
-		fx.root.scale.setScalar(EFFECT_SCALE)
-		wallGroup.add(fx.root)
+		fx = activeEffect
+		activeEffect.root.scale.setScalar(EFFECT_SCALE)
+		activeEffect.root.visible = false
+		activePlacer.wallGroup.add(activeEffect.root)
 
-		group.add(wallGroup)
 		scene.add(group)
 
 		// Hidden until the coach marker is confirmed. untrack keeps this setup
 		// effect from re-running (and rebuilding the scene) on reveal.
 		group.visible = untrack(() => xr.contentVisible)
+		const activeGroup = group
+
+		// ── Placement helpers -------------------------------------------------
+		const [kx, ky, kz] = KEY_LIGHT.offset
+
+		const placeCastle = (anchor: THREE.Vector3) => {
+			activeEffect.root.position.copy(anchor)
+			activeEffect.root.visible = true
+			// Burst bodies / particles must land on the real floor (world y = 0):
+			// the effect's floor is `anchor.y` below its origin, in local units.
+			activeEffect.setConfig({ burstFloorY: -anchor.y / EFFECT_SCALE })
+			key.position.set(anchor.x + kx, anchor.y + ky, anchor.z + kz)
+			key.target.position.copy(anchor)
+			activePlacer.setDebug(debug)
+			activeEffect.startEntrance()
+			kfc.stage = 'play'
+		}
+
+		restart = () => {
+			activePlacer.reset()
+			activeEffect.root.visible = false // placeCastle() resets + restarts it
+			kfc.stage = 'wall'
+			kfc.aimValid = false
+			kfc.burstCount = 0
+		}
 
 		// ── Load the GLBs, then pre-compile with the group briefly visible. That
 		//    block is synchronous, so no frame renders in between.
 		let cancelled = false
-		const activeEffect = fx
-		const activeGroup = group
 		activeEffect
 			.load()
 			.then(() => {
 				if (cancelled) return
 				const wasVisible = activeGroup.visible
+				const fxWasVisible = activeEffect.root.visible
 				activeGroup.visible = true
+				activeEffect.root.visible = true
 				renderer.compile(scene, camera)
+				activeEffect.root.visible = fxWasVisible
 				activeGroup.visible = wasVisible
 				kfc.loaded = true
-				// Already revealed (e.g. slow network) → start right away.
-				if (untrack(() => xr.contentVisible)) activeEffect.startEntrance()
 			})
 			.catch((error: unknown) => {
 				if (cancelled) return
@@ -143,16 +149,33 @@
 			name: UPDATE_MODULE_NAME,
 			onUpdate: () => {
 				const dt = clock.getDelta()
-				if (activeGroup.visible) activeEffect.update(dt)
+				if (!activeGroup.visible) return
+				activePlacer.update(camera)
+				if (kfc.aimValid !== activePlacer.aimValid) kfc.aimValid = activePlacer.aimValid
+				if (activePlacer.stage === 'play') activeEffect.update(dt)
 			}
 		})
 
-		// ── Tap on castle / box wall → burst.
+		// ── Taps: confirm wall → confirm castle → burst.
 		const raycaster = new THREE.Raycaster()
 		const ndc = new THREE.Vector2()
 		const canvas = renderer.domElement
 		const onPointerDown = (event: PointerEvent) => {
-			if (!activeGroup.visible || !activeEffect.isLoaded) return
+			if (!activeGroup.visible) return
+
+			if (activePlacer.stage === 'wall') {
+				if (activePlacer.confirmWall()) kfc.stage = 'castle'
+				return
+			}
+			if (activePlacer.stage === 'castle') {
+				if (!activeEffect.isLoaded) return
+				const anchor = activePlacer.confirmCastle()
+				if (anchor) placeCastle(anchor)
+				return
+			}
+
+			// stage play → raycast against castle / box walls.
+			if (!activeEffect.isLoaded) return
 			const rect = canvas.getBoundingClientRect()
 			ndc.set(
 				((event.clientX - rect.left) / rect.width) * 2 - 1,
@@ -170,9 +193,8 @@
 			XR8.removeCameraPipelineModule(UPDATE_MODULE_NAME)
 
 			activeEffect.dispose()
+			activePlacer.dispose()
 			scene.remove(activeGroup)
-			wallGeometry.dispose()
-			wallMaterial.dispose()
 			key.dispose()
 
 			if (scene.environment === envTexture) {
@@ -182,18 +204,19 @@
 			envTexture.dispose()
 
 			kfc.reset()
+			restart = undefined
 			fx = undefined
 			group = undefined
 		}
 	})
 
-	// Reveal / hide reactively, and (re)play the entrance on every reveal or
-	// recenter ("다시 배치") so the castle always emerges from the freshly placed wall.
+	// Reveal / hide reactively; every reveal or recenter ("다시 배치") restarts
+	// the placement flow from the floor line.
 	$effect(() => {
 		const visible = xr.contentVisible
 		void xr.recenterCount
 		if (!group) return
 		group.visible = visible
-		if (visible && fx?.isLoaded) fx.startEntrance()
+		if (visible && fx?.isLoaded) restart?.()
 	})
 </script>

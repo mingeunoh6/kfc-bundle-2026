@@ -31,7 +31,25 @@
 		다시 배치
 	</button>
 
-	{#if kfc.phase === 'entrance'}
+	{#if kfc.stage === 'wall'}
+		<div class="hint step">
+			<span class="badge">1 / 2</span>
+			{#if kfc.aimValid}
+				<p>흰 선을 <b>실제 벽의 맨 아래</b>에 맞추고<br />화면을 탭하세요</p>
+			{:else}
+				<p>바닥을 향해 카메라를 내려주세요</p>
+			{/if}
+		</div>
+	{:else if kfc.stage === 'castle'}
+		<div class="hint step">
+			<span class="badge">2 / 2</span>
+			{#if kfc.aimValid}
+				<p>빨간 원을 <b>벽의 조형물 위치</b>에 맞추고<br />화면을 탭하세요</p>
+			{:else}
+				<p>벽면을 향해 카메라를 올려주세요</p>
+			{/if}
+		</div>
+	{:else if kfc.phase === 'entrance'}
 		<div class="hint">
 			<p>벽면에 작품이 나타나고 있어요…</p>
 		</div>
@@ -108,6 +126,26 @@
 		text-align: center;
 		white-space: nowrap;
 		backdrop-filter: blur(6px);
+	}
+
+	.step {
+		border-radius: 1rem;
+		padding: 0.7rem 1.2rem;
+		white-space: normal;
+		line-height: 1.45;
+		max-width: 80vw;
+	}
+
+	.step b {
+		color: #ffd2d2;
+	}
+
+	.badge {
+		padding: 0.1rem 0.55rem;
+		border-radius: 999px;
+		background: #e1021f;
+		font-size: 0.7rem;
+		font-weight: 800;
 	}
 
 	.guide {

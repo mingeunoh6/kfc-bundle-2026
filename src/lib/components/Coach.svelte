@@ -28,9 +28,9 @@
 		<div class="title">작품 감상 TIP!</div>
 		<Lottie src="/lottie/coach2.json" class="guide" />
 		<div class="body">
-			<p class="main">벽면을 정면으로 비추고<br />시작하기를 눌러주세요</p>
+			<p class="main">벽면의 조형물 앞에 서서<br />시작하기를 눌러주세요</p>
 			<p class="sub">
-				2~3m 앞의 벽면에 작품이 나타납니다.<br />
+				① 흰 선을 벽 아래에 맞춰 탭 → ② 빨간 원을 조형물에 맞춰 탭<br />
 				모바일 화면을 상하좌우로 움직여 작품을 즐겨보세요.
 			</p>
 			{#if kfc.error}

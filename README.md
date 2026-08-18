@@ -8,12 +8,12 @@ Mattercraft + Immersal(VPS)로 제작됐던 KFC 매장 벽면 AR을 **8th Wall �
 1. **Start** → 카메라 권한 → **Splash**
 2. **Coach** 마커: 뒤에서 GLB 5종(castle_white / rock / kfcbox_source / kfcbox / chicken, `static/models/`)을
    내려받고 pre-compile. 버튼은 로딩 완료 후 활성화.
-3. **시작하기** → `XR8.XrController.recenter()` → 카메라 정면 `WALL_DISTANCE`(2.5 m)에
-   보이지 않는 **가상 벽**(BoxGeometry + ShadowMaterial)을 세우고, 그 벽면 앵커(`WALL_ANCHOR_HEIGHT` 1.0 m)에
-   `KfcEffect`를 부착 → 입장 연출(캐슬이 벽에서 밀려나오고, 양옆으로 KFC 박스가 쌓임).
-4. 캐슬/박스 벽 **터치** → 박스·치킨 버스트 + 스파이스 파우더 파티클, 실제 바닥(y=0)에 물리 낙하.
-5. 첫 버스트 후 하단에 KFC 앱 CTA. 우상단 **다시 배치**로 recenter + 입장 재생.
-
+3. **시작하기** → `XR8.XrController.recenter()` → **Vertical Wall AR 세팅** ([docs/VERTICAL_WALL_AR.md](docs/VERTICAL_WALL_AR.md)):
+   1. 바닥에 카메라 방향과 수직인 **흰 라인**이 카메라 중심 레이를 따라다님 → 실제 벽 아래에 맞추고 탭 → 그 자리에 가상 벽 생성
+   2. 가상 벽(아래 흰색 → 위 투명 그라데이션) 위에 **빨간 링**이 레이 교차점을 따라다님 → 조형물 위치에 맞추고 탭
+   3. 벽 비가시화(그림자만), 그 지점에 `KfcEffect` 배치(`burstFloorY`는 앵커 높이에서 재유도 → 실제 바닥 착지) → 입장 연출
+4. 캐슬/박스 벽 **터치** → 박스·치킨 버스트 + 스파이스 파우더 파티클.
+5. 첫 버스트 후 하단에 KFC 앱 CTA(Lottie). 우상단 **다시 배치**로 recenter + 1단계부터 다시.
 ## 코드 위치
 
 - `src/lib/kfc/KfcEffect.ts` — Mattercraft `KfcEffectComponent`(kfctest.ts)의 프레임워크 무관 포팅.

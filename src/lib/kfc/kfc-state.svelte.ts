@@ -1,7 +1,8 @@
 // Reactive state of the KFC experience, shared between MainScene (which drives
-// the three.js effect) and the UI components (Coach button, MainUI hints).
+// the three.js effect + wall placement) and the UI components.
 
 import type { KfcPhase } from './KfcEffect'
+import type { PlacementStage } from './wall-placer'
 
 class KfcState {
 	/** GLB download progress 0..1 while the effect is loading. */
@@ -15,7 +16,14 @@ class KfcState {
 	/** Load / runtime error, if any. */
 	error = $state<string | null>(null)
 
-	readonly canTap = $derived(this.phase === 'idle' || this.phase === 'burst')
+	/** Vertical Wall AR placement stage (see docs/VERTICAL_WALL_AR.md). */
+	stage = $state<PlacementStage>('wall')
+	/** Whether the centre ray currently hits the floor (stage wall) / wall (stage castle). */
+	aimValid = $state(false)
+
+	readonly canTap = $derived(
+		this.stage === 'play' && (this.phase === 'idle' || this.phase === 'burst')
+	)
 
 	reset() {
 		this.loadProgress = 0
@@ -23,6 +31,8 @@ class KfcState {
 		this.phase = 'loading'
 		this.burstCount = 0
 		this.error = null
+		this.stage = 'wall'
+		this.aimValid = false
 	}
 }
 
