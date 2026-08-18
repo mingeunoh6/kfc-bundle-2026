@@ -46,18 +46,35 @@
 				license: `${SITE_URL}/#license`
 			},
 			{
-				'@type': 'Restaurant',
+				'@type': ['Restaurant', 'FastFoodRestaurant'],
 				'@id': `${SITE_URL}/#store`,
 				name: SITE.store.name,
+				alternateName: [...SITE.store.alternateName],
+				description: SITE.store.description,
 				brand: { '@type': 'Brand', name: SITE.store.brand },
 				servesCuisine: 'Fried chicken',
 				hasDriveThroughService: true,
+				hasMap: SITE.store.mapUrl,
+				subjectOf: {
+					'@type': 'NewsArticle',
+					url: SITE.store.newsUrl,
+					headline: 'KFC 수원장안DT점 오픈 — MD존·컬처월·AR 콘텐츠',
+					datePublished: SITE.store.openingDate,
+					publisher: { '@type': 'Organization', name: '신아일보' }
+				},
 				address: {
 					'@type': 'PostalAddress',
+					streetAddress: SITE.store.streetAddress,
 					addressLocality: SITE.store.addressLocality,
 					addressRegion: SITE.store.addressRegion,
 					addressCountry: SITE.store.addressCountry
-				}
+				},
+				amenityFeature: [
+					{ '@type': 'LocationFeatureSpecification', name: '드라이브 스루 (Drive-Thru)', value: true },
+					{ '@type': 'LocationFeatureSpecification', name: '컬처월 (수원화성 × KFC 버켓 설치미술)', value: true },
+					{ '@type': 'LocationFeatureSpecification', name: 'MD존 (브랜드 굿즈)', value: true },
+					{ '@type': 'LocationFeatureSpecification', name: 'QR Web AR 콘텐츠', value: true }
+				]
 			},
 			{
 				'@type': ['Person', 'Organization'],
@@ -96,7 +113,7 @@
 	<meta name="mobile-web-app-capable" content="yes" />
 	<meta name="format-detection" content="telephone=no" />
 	<meta name="geo.region" content="KR-41" />
-	<meta name="geo.placename" content="수원시, 경기도" />
+	<meta name="geo.placename" content="경기도 수원시 장안구 경수대로 992 (KFC 수원장안DT점)" />
 	<link rel="canonical" href={SITE_URL} />
 	<link rel="alternate" hreflang="ko" href={SITE_URL} />
 
