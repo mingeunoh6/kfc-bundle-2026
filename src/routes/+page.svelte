@@ -1,3 +1,8 @@
+<!--
+	KFC 수원 장안점 드라이브 스루 Web AR (WebXR) — created by OOMG (Web-based AR / WebXR / AR creator).
+	Copyright (c) 2026 OOMG. All rights reserved. Unauthorized copying, use, modification or
+	redistribution of this source code is prohibited. See LICENSE.md.
+-->
 <script lang="ts">
 	import ARScene from '$lib/components/ARScene.svelte'
 	import ArHud from '$lib/components/ArHud.svelte'
@@ -7,6 +12,64 @@
 	import Splash from '$lib/components/Splash.svelte'
 	import Start from '$lib/components/Start.svelte'
 	import { xr } from '$lib/xr/xr-state.svelte'
+	import { CREATOR, SITE, SITE_URL } from '$lib/site'
+
+	const ogImage = SITE_URL + SITE.ogImagePath
+
+	// schema.org graph: the Web AR app + the KFC store it is made for + the creator.
+	const jsonLd = JSON.stringify({
+		'@context': 'https://schema.org',
+		'@graph': [
+			{
+				'@type': ['WebApplication', 'CreativeWork'],
+				'@id': `${SITE_URL}/#app`,
+				name: SITE.name,
+				headline: SITE.title,
+				description: SITE.description,
+				url: SITE_URL,
+				image: ogImage,
+				inLanguage: SITE.language,
+				applicationCategory: 'EntertainmentApplication',
+				applicationSubCategory: 'Augmented Reality (WebXR / Web AR)',
+				operatingSystem: 'iOS, Android',
+				browserRequirements: 'Requires a mobile browser with camera access (Safari, Chrome)',
+				isAccessibleForFree: true,
+				offers: { '@type': 'Offer', price: '0', priceCurrency: 'KRW' },
+				keywords: SITE.keywords.join(', '),
+				about: { '@id': `${SITE_URL}/#store` },
+				locationCreated: { '@id': `${SITE_URL}/#store` },
+				creator: { '@id': `${SITE_URL}/#creator` },
+				author: { '@id': `${SITE_URL}/#creator` },
+				copyrightHolder: { '@id': `${SITE_URL}/#creator` },
+				copyrightYear: CREATOR.year,
+				copyrightNotice: `© ${CREATOR.year} ${CREATOR.name}. All rights reserved.`,
+				license: `${SITE_URL}/#license`
+			},
+			{
+				'@type': 'Restaurant',
+				'@id': `${SITE_URL}/#store`,
+				name: SITE.store.name,
+				brand: { '@type': 'Brand', name: SITE.store.brand },
+				servesCuisine: 'Fried chicken',
+				hasDriveThroughService: true,
+				address: {
+					'@type': 'PostalAddress',
+					addressLocality: SITE.store.addressLocality,
+					addressRegion: SITE.store.addressRegion,
+					addressCountry: SITE.store.addressCountry
+				}
+			},
+			{
+				'@type': ['Person', 'Organization'],
+				'@id': `${SITE_URL}/#creator`,
+				name: CREATOR.name,
+				description: CREATOR.role,
+				jobTitle: CREATOR.role,
+				knowsAbout: ['Web AR', 'WebXR', 'Augmented Reality', '8th Wall', 'three.js', 'SvelteKit'],
+				url: CREATOR.url
+			}
+		]
+	})
 
 	// The AR session only mounts after the user taps 시작하기 on the start screen.
 	let started = $state(false)
@@ -18,8 +81,45 @@
 </script>
 
 <svelte:head>
-	<title>KFC AR</title>
-	<meta name="description" content="KFC 캐슬 AR — 8th Wall 월드 트래킹으로 벽면에 나타나는 KFC 성과 치킨 버스트 연출." />
+	<!-- SEO / GEO -->
+	<title>{SITE.title}</title>
+	<meta name="description" content={SITE.description} />
+	<meta name="keywords" content={SITE.keywords.join(', ')} />
+	<meta name="author" content={CREATOR.name} />
+	<meta name="creator" content="{CREATOR.name} — {CREATOR.role}" />
+	<meta name="copyright" content="© {CREATOR.year} {CREATOR.name}. All rights reserved." />
+	<meta name="robots" content="index, follow, max-image-preview:large" />
+	<meta name="theme-color" content="#e1021f" />
+	<meta name="application-name" content={SITE.name} />
+	<meta name="apple-mobile-web-app-title" content={SITE.name} />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="mobile-web-app-capable" content="yes" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="geo.region" content="KR-41" />
+	<meta name="geo.placename" content="수원시, 경기도" />
+	<link rel="canonical" href={SITE_URL} />
+	<link rel="alternate" hreflang="ko" href={SITE_URL} />
+
+	<!-- Open Graph -->
+	<meta property="og:type" content="website" />
+	<meta property="og:site_name" content={SITE.name} />
+	<meta property="og:title" content={SITE.title} />
+	<meta property="og:description" content={SITE.description} />
+	<meta property="og:url" content={SITE_URL} />
+	<meta property="og:image" content={ogImage} />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
+	<meta property="og:image:alt" content="{SITE.name} — Web AR 체험" />
+	<meta property="og:locale" content={SITE.locale} />
+
+	<!-- Twitter / X -->
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content={SITE.title} />
+	<meta name="twitter:description" content={SITE.description} />
+	<meta name="twitter:image" content={ogImage} />
+
+	<!-- Structured data (schema.org) for search & AI engines -->
+	{@html `<script type="application/ld+json">${jsonLd}</script>`}
 </svelte:head>
 
 {#if !started}

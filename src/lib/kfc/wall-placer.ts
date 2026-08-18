@@ -1,3 +1,8 @@
+/*!
+ * KFC 수원 장안점 드라이브 스루 Web AR (WebXR) — created by OOMG (Web-based AR / WebXR / AR creator).
+ * Copyright (c) 2026 OOMG. All rights reserved. Unauthorized copying, use, modification or
+ * redistribution of this source code is prohibited. See LICENSE.md.
+ */
 // WallPlacer — the "Vertical Wall AR" placement helpers (see docs/VERTICAL_WALL_AR.md).
 //
 // Stage 'wall'   : a white line on the floor follows the camera's centre ray

@@ -1,4 +1,9 @@
 <!--
+	KFC 수원 장안점 드라이브 스루 Web AR (WebXR) — created by OOMG (Web-based AR / WebXR / AR creator).
+	Copyright (c) 2026 OOMG. All rights reserved. Unauthorized copying, use, modification or
+	redistribution of this source code is prohibited. See LICENSE.md.
+-->
+<!--
 	ARScene — owns the camera-feed canvas and the 8th Wall session lifecycle.
 
 	Mirrors app.js of the official example: register the standard pipeline modules,

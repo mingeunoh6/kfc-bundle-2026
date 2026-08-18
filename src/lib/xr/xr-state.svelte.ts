@@ -1,3 +1,8 @@
+/*!
+ * KFC 수원 장안점 드라이브 스루 Web AR (WebXR) — created by OOMG (Web-based AR / WebXR / AR creator).
+ * Copyright (c) 2026 OOMG. All rights reserved. Unauthorized copying, use, modification or
+ * redistribution of this source code is prohibited. See LICENSE.md.
+ */
 // Reactive AR session state, shared app-wide via Svelte 5 runes.
 // Any component can `import { xr } from '$lib/xr/xr-state.svelte'` and read
 // `xr.status` etc. inside markup or $derived/$effect — updates are fully reactive.

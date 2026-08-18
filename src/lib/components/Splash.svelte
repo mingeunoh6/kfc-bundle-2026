@@ -1,4 +1,9 @@
 <!--
+	KFC 수원 장안점 드라이브 스루 Web AR (WebXR) — created by OOMG (Web-based AR / WebXR / AR creator).
+	Copyright (c) 2026 OOMG. All rights reserved. Unauthorized copying, use, modification or
+	redistribution of this source code is prohibited. See LICENSE.md.
+-->
+<!--
 	Splash — custom loading screen shown while the 8th Wall engine downloads and
 	the camera session starts. Replaces XRExtras.Loading.pipelineModule() (the
 	default 8th Wall spinner + logo), which is intentionally NOT registered in

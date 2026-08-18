@@ -1,4 +1,9 @@
 <!--
+	KFC 수원 장안점 드라이브 스루 Web AR (WebXR) — created by OOMG (Web-based AR / WebXR / AR creator).
+	Copyright (c) 2026 OOMG. All rights reserved. Unauthorized copying, use, modification or
+	redistribution of this source code is prohibited. See LICENSE.md.
+-->
+<!--
 	MainUI — the UI layer rendered together with MainScene once the AR content is
 	revealed. Ports the in-experience UI of the Mattercraft scene:
 	  • touch guide ("성을 터치해보세요") until the first burst — replaces the

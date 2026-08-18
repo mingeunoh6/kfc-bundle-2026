@@ -1,4 +1,9 @@
 <!--
+	KFC 수원 장안점 드라이브 스루 Web AR (WebXR) — created by OOMG (Web-based AR / WebXR / AR creator).
+	Copyright (c) 2026 OOMG. All rights reserved. Unauthorized copying, use, modification or
+	redistribution of this source code is prohibited. See LICENSE.md.
+-->
+<!--
 	Coach — coach marker popup shown once the camera feed is live. Explains the
 	interaction, and on confirm: recenters the SLAM origin (so the virtual wall is
 	placed straight in front of the user) and reveals the pre-compiled MainScene.

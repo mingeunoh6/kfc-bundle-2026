@@ -1,3 +1,8 @@
+/*!
+ * KFC 수원 장안점 드라이브 스루 Web AR (WebXR) — created by OOMG (Web-based AR / WebXR / AR creator).
+ * Copyright (c) 2026 OOMG. All rights reserved. Unauthorized copying, use, modification or
+ * redistribution of this source code is prohibited. See LICENSE.md.
+ */
 // Minimal type surface of the 8th Wall open-source engine (https://github.com/8thwall/8thwall)
 // covering the APIs used by this template. The engine binary attaches `XR8`, `XRExtras`
 // and `LandingPage` to `window` when its script tags finish loading.

@@ -1,3 +1,8 @@
+/*!
+ * KFC 수원 장안점 드라이브 스루 Web AR (WebXR) — created by OOMG (Web-based AR / WebXR / AR creator).
+ * Copyright (c) 2026 OOMG. All rights reserved. Unauthorized copying, use, modification or
+ * redistribution of this source code is prohibited. See LICENSE.md.
+ */
 // The 8th Wall engine binary shows a few DOM prompts of its own (e.g. the iOS
 // "AR requires access to device motion sensors" box, `.prompt-box-8w`) that are
 // created imperatively on document.body with English copy. We can't configure

@@ -1,6 +1,9 @@
 {
 	"name": "kfc-webxr",
 	"private": true,
+	"description": "KFC 수원 장안점 드라이브 스루 매장 Web AR (WebXR) 체험 — created by OOMG (Web-based AR / WebXR creator). Proprietary; copying, use or modification of the source code is not permitted.",
+	"author": "OOMG <mingeunoh6@gmail.com> (https://github.com/mingeunoh6)",
+	"license": "UNLICENSED",
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {

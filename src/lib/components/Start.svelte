@@ -1,4 +1,9 @@
 <!--
+	KFC 수원 장안점 드라이브 스루 Web AR (WebXR) — created by OOMG (Web-based AR / WebXR / AR creator).
+	Copyright (c) 2026 OOMG. All rights reserved. Unauthorized copying, use, modification or
+	redistribution of this source code is prohibited. See LICENSE.md.
+-->
+<!--
 	Start — the first screen the user sees (port of the Mattercraft splash in
 	index.html). The AR session (and therefore the camera permission prompt +
 	engine download) only begins after the user taps the start button, which

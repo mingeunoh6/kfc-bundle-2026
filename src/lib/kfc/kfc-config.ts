@@ -1,3 +1,8 @@
+/*!
+ * KFC 수원 장안점 드라이브 스루 Web AR (WebXR) — created by OOMG (Web-based AR / WebXR / AR creator).
+ * Copyright (c) 2026 OOMG. All rights reserved. Unauthorized copying, use, modification or
+ * redistribution of this source code is prohibited. See LICENSE.md.
+ */
 // Tunable parameters of the KFC castle effect. Ported 1:1 from the Mattercraft
 // `KfcEffectComponent` (kfctest.ts): every `@zui` Observable became a plain field
 // here. The defaults below are NOT the code defaults of the original component
