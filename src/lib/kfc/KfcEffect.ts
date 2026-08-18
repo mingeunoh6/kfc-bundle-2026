@@ -1192,11 +1192,18 @@ export class KfcEffect {
 	// Per-frame update
 	// ─────────────────────────────────────────────────────────────────────────
 
+	/**
+	 * Global playback speed of the whole effect (entrance, wall drop, burst
+	 * physics, particles). 1 = the Mattercraft-tuned timing; >1 = faster. Applied
+	 * after the per-frame clamp so low frame rates don't slow it down further.
+	 */
+	timeScale = 1
+
 	/** Advances the effect by `dt` seconds. Call once per rendered frame. */
 	update(dt: number) {
 		if (!this.loaded) return
 
-		const delta = Math.min(dt, 0.05)
+		const delta = Math.min(dt, 0.05) * this.timeScale
 
 		switch (this._phase) {
 			case 'entrance':

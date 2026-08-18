@@ -230,6 +230,12 @@ export const DEFAULT_KFC_CONFIG: KfcEffectConfig = {
 	dustSpeed: 10
 }
 
+/**
+ * Global playback speed multiplier for the effect (KfcEffect.timeScale). The
+ * Scene.zcomp timings/physics are kept as-is; this just plays them faster.
+ */
+export const EFFECT_TIME_SCALE = 1.8
+
 /** Uniform scale of the effect group in the Mattercraft scene (world m per local unit). */
 export const EFFECT_SCALE = 0.31505093908441123
 

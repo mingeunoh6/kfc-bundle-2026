@@ -28,7 +28,7 @@
 	import { kfc } from '$lib/kfc/kfc-state.svelte'
 	import { KfcEffect } from '$lib/kfc/KfcEffect'
 	import { WallPlacer } from '$lib/kfc/wall-placer'
-	import { EFFECT_SCALE } from '$lib/kfc/kfc-config'
+	import { EFFECT_SCALE, EFFECT_TIME_SCALE } from '$lib/kfc/kfc-config'
 	import { KEY_LIGHT, WALL_HEIGHT, WALL_SHADOW_OPACITY, WALL_WIDTH } from '$lib/kfc/wall-layout'
 
 	const UPDATE_MODULE_NAME = 'kfc-update'
@@ -92,6 +92,7 @@
 			}
 		)
 		fx = activeEffect
+		activeEffect.timeScale = EFFECT_TIME_SCALE
 		activeEffect.root.scale.setScalar(EFFECT_SCALE)
 		activeEffect.root.visible = false
 		activePlacer.wallGroup.add(activeEffect.root)
