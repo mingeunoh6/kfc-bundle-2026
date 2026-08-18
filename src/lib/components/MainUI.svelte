@@ -16,7 +16,6 @@
 <script lang="ts">
 	import { xr } from '$lib/xr/xr-state.svelte'
 	import { kfc } from '$lib/kfc/kfc-state.svelte'
-	import touchGuideUrl from '$lib/assets/touch_guide.png'
 	import Lottie from './Lottie.svelte'
 
 	const KFC_APP_URL =
@@ -60,8 +59,7 @@
 		</div>
 	{:else if showTouchGuide}
 		<div class="hint guide">
-			<img src={touchGuideUrl} alt="" />
-			<p>성을 터치해보세요!</p>
+			<p>👆 성을 터치해보세요!</p>
 		</div>
 	{/if}
 
@@ -154,14 +152,8 @@
 	}
 
 	.guide {
-		border-radius: 1rem;
-		padding: 0.8rem 1.4rem;
+		padding: 0.75rem 1.4rem;
 		animation: pulse 1.6s ease-in-out infinite;
-	}
-
-	.guide img {
-		height: 2.2rem;
-		opacity: 0.9;
 	}
 
 	@keyframes pulse {
